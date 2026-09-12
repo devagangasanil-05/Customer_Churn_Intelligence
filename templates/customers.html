@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Explorer — ChurnIQ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="bento-body">
+
+<div class="app">
+
+    <!-- AURORA AMBIENCE -->
+    <div class="aurora-orb aurora-one"></div>
+    <div class="aurora-orb aurora-two"></div>
+
+    <!-- TOP RIBBON (Matches Home & Dashboard) -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="brand">
+                <div class="brand-mark">CI</div>
+                <span>ChurnIQ</span>
+            </a>
+
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/dashboard">Dashboard</a>
+                <a href="/customers" class="active">Customers</a>
+                <a href="/risk">Risk Analysis</a>
+                <a href="/insights">Insights</a>
+            </div>
+
+            <div class="nav-right">
+                <button class="theme-switch-capsule" id="themeToggle" type="button" aria-label="Toggle Theme" title="Toggle theme">
+                    <span class="capsule-icon sun-icon">☀</span>
+                    <span class="capsule-icon moon-icon">☾</span>
+                    <span class="capsule-slider"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CUSTOMER EXPLORER DECK -->
+    <main class="clean-deck">
+
+        <!-- HEADER -->
+        <header class="deck-header">
+            <div>
+                <span class="deck-eyebrow">SUBSCRIBER DIRECTORY</span>
+                <h1 class="deck-title">Customer Explorer</h1>
+                <p class="deck-subtitle">Search, filter, and audit individual customer risk profiles and account lifecycles.</p>
+            </div>
+            <div class="deck-status-tag">
+                <span class="status-indicator-dot"></span>
+                <span>{{ customers|length if customers else 0 }} Records Loaded</span>
+            </div>
+        </header>
+
+        <!-- UNIFIED COMMAND & FILTER CONSOLE -->
+        <section class="deck-card spotlight-card filter-console-card">
+            <form method="GET" action="/customers" class="filter-console-form">
+                <div class="filter-inputs-row">
+                    <div class="filter-field search-field">
+                        <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" name="search" placeholder="Search Customer ID..." value="{{ request.args.get('search', '') }}" class="console-input">
+                    </div>
+
+                    <div class="filter-field">
+                        <select name="contract" class="console-select">
+                            <option value="">All Contract Types</option>
+                            <option value="Month-to-month" {% if request.args.get('contract') == 'Month-to-month' %}selected{% endif %}>Month-to-month</option>
+                            <option value="One year" {% if request.args.get('contract') == 'One year' %}selected{% endif %}>One year</option>
+                            <option value="Two year" {% if request.args.get('contract') == 'Two year' %}selected{% endif %}>Two year</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-field">
+                        <select name="churn" class="console-select">
+                            <option value="">All Churn Statuses</option>
+                            <option value="No" {% if request.args.get('churn') == 'No' %}selected{% endif %}>Active Only</option>
+                            <option value="Yes" {% if request.args.get('churn') == 'Yes' %}selected{% endif %}>Churned Only</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-actions-group">
+                        <button type="submit" class="console-btn-primary">
+                            Apply
+                        </button>
+
+                        {% if request.args.get('search') or request.args.get('contract') or request.args.get('churn') %}
+                        <a href="/customers" class="console-btn-ghost">Reset</a>
+                        {% endif %}
+
+                        <a href="/export-customers?{{ request.query_string.decode('utf-8') }}" class="console-btn-secondary">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Export CSV
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <!-- SUBSCRIBER LEDGER TABLE -->
+        <section class="deck-card spotlight-card table-glass-card ledger-container">
+            <div class="table-scroll-wrapper">
+                <table class="clean-deck-table ledger-table">
+                    <thead>
+                        <tr>
+                            <th>SUBSCRIBER</th>
+                            <th>PROFILE</th>
+                            <th>TENURE</th>
+                            <th>CONTRACT</th>
+                            <th>MONTHLY BILL</th>
+                            <th>PAYMENT METHOD</th>
+                            <th>STATUS</th>
+                            <th style="text-align: right;">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if customers %}
+                            {% for c in customers %}
+                            <tr class="ledger-row">
+                                <td>
+                                    <span class="ledger-id">{{ c.customer_id }}</span>
+                                </td>
+                                <td>
+                                    <span class="ledger-demographics">
+                                        {{ c.gender }}, {% if c.senior_citizen == 1 %}Senior{% else %}Non-Senior{% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="ledger-val">{{ c.tenure }} mos</span>
+                                </td>
+                                <td>
+                                    {% if c.contract == 'Month-to-month' %}
+                                    <span class="chip-contract chip-contract-m2m">{{ c.contract }}</span>
+                                    {% else %}
+                                    <span class="chip-contract chip-contract-long">{{ c.contract }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="ledger-price">${{ "%.2f"|format(c.monthly_charges) }}</span>
+                                </td>
+                                <td>
+                                    <span class="ledger-muted">{{ c.payment_method }}</span>
+                                </td>
+                                <td>
+                                    {% if c.churn == 'Yes' or c.churn == 1 %}
+                                    <span class="status-chip status-churned">
+                                        <span class="status-dot-sm red"></span>
+                                        Churned
+                                    </span>
+                                    {% else %}
+                                    <span class="status-chip status-active">
+                                        <span class="status-dot-sm green"></span>
+                                        Active
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: right;">
+                                    <a href="/risk?customer_id={{ c.customer_id }}&gender={{ c.gender }}&senior_citizen={{ c.senior_citizen }}&partner={{ c.partner }}&dependents={{ c.dependents }}&tenure={{ c.tenure }}&contract={{ c.contract }}&monthly_charges={{ c.monthly_charges }}&payment_method={{ c.payment_method }}&internet_service={{ c.internet_service }}&online_security={{ c.online_security }}&tech_support={{ c.tech_support }}&paperless_billing={{ c.paperless_billing }}"
+                                       class="deck-action-btn">
+                                        Analyze Risk &rarr;
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="empty-state-cell">
+                                    <div class="empty-ledger-state">
+                                        <p class="empty-title">No subscriber records matched your criteria.</p>
+                                        <p class="empty-sub">Try broadening your search query or clearing your active filters.</p>
+                                        <a href="/customers" class="console-btn-primary" style="display: inline-block; margin-top: 14px;">Reset Filters</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div>
+            <strong>ChurnIQ</strong>
+            <span>Customer Retention Intelligence</span>
+        </div>
+        <span>Python · Flask · MySQL</span>
+    </footer>
+
+</div>
+
+<script>
+// SPOTLIGHT MOUSE ENGINE
+document.querySelectorAll(".spotlight-card").forEach(card => {
+    card.addEventListener("mousemove", e => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
+        card.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
+    });
+});
+</script>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

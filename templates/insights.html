@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategic Insights — ChurnIQ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="bento-body">
+
+<div class="app">
+
+    <!-- AURORA AMBIENCE -->
+    <div class="aurora-orb aurora-one"></div>
+    <div class="aurora-orb aurora-two"></div>
+
+    <!-- TOP RIBBON (Matches Home, Dashboard, Customers & Risk) -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="brand">
+                <div class="brand-mark">CI</div>
+                <span>ChurnIQ</span>
+            </a>
+
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/dashboard">Dashboard</a>
+                <a href="/customers">Customers</a>
+                <a href="/risk">Risk Analysis</a>
+                <a href="/insights" class="active">Insights</a>
+            </div>
+
+            <div class="nav-right">
+                <button class="theme-switch-capsule" id="themeToggle" type="button" aria-label="Toggle Theme" title="Toggle theme">
+                    <span class="capsule-icon sun-icon">☀</span>
+                    <span class="capsule-icon moon-icon">☾</span>
+                    <span class="capsule-slider"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- STRATEGIC INSIGHTS DECK -->
+    <main class="clean-deck">
+
+        <!-- HEADER -->
+        <header class="deck-header">
+            <div>
+                <span class="deck-eyebrow">STRATEGIC SYNTHESIS</span>
+                <h1 class="deck-title">Retention Insights & Actions</h1>
+                <p class="deck-subtitle">Data-backed findings derived from subscription cohorts, monthly recurring revenue impact, and contract friction points.</p>
+            </div>
+            <div class="deck-status-tag">
+                <span class="status-indicator-dot"></span>
+                <span>Direct SQL Telemetry</span>
+            </div>
+        </header>
+
+        <!-- STRATEGY PLAYBOOK CARDS (3-COLUMN SPOTLIGHT GRID) -->
+        <section class="insights-card-grid">
+
+            <!-- Card 01: Highest Exposure Segment -->
+            <article class="deck-card spotlight-card playbook-card">
+                <div class="playbook-top">
+                    <span class="playbook-tag tag-danger">HIGHEST EXPOSURE SEGMENT</span>
+                    <h3 class="playbook-title">Month-to-Month Fiber Optic</h3>
+                    <p class="playbook-desc">
+                        Subscribers with monthly contracts on fiber connections churn at <strong class="text-danger">54.61%</strong>, placing <strong class="text-primary">$185,181.10</strong> in monthly revenue at risk.
+                    </p>
+                </div>
+                <div class="playbook-action-banner banner-danger">
+                    <div class="action-icon-pill icon-danger">⚡</div>
+                    <div class="action-text-wrap">
+                        <span class="action-label">EXECUTION PLAYBOOK</span>
+                        <p class="action-body">Offer bundled tech support and 12-month lock-in pricing.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Card 02: High-Value Attrition -->
+            <article class="deck-card spotlight-card playbook-card">
+                <div class="playbook-top">
+                    <span class="playbook-tag tag-warning">HIGH-VALUE ATTRITION</span>
+                    <h3 class="playbook-title">Premium Plan Churn</h3>
+                    <p class="playbook-desc">
+                        A total of <strong class="text-warning">910 churned customers</strong> were paying &ge; $80/mo, totaling <strong class="text-primary">$85,669.35</strong> in lost monthly recurring revenue.
+                    </p>
+                </div>
+                <div class="playbook-action-banner banner-warning">
+                    <div class="action-icon-pill icon-warning">🎯</div>
+                    <div class="action-text-wrap">
+                        <span class="action-label">EXECUTION PLAYBOOK</span>
+                        <p class="action-body">Prioritize outbound retention calls for accounts above $80/mo.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Card 03: Billing Channel Friction -->
+            <article class="deck-card spotlight-card playbook-card">
+                <div class="playbook-top">
+                    <span class="playbook-tag tag-info">BILLING CHANNEL FRICTION</span>
+                    <h3 class="playbook-title">Electronic Check Vulnerability</h3>
+                    <p class="playbook-desc">
+                        Electronic check users experience significantly higher churn than automated credit card and bank transfer subscribers.
+                    </p>
+                </div>
+                <div class="playbook-action-banner banner-info">
+                    <div class="action-icon-pill icon-info">💳</div>
+                    <div class="action-text-wrap">
+                        <span class="action-label">EXECUTION PLAYBOOK</span>
+                        <p class="action-body">Provide a one-time bill credit for switching to auto-pay.</p>
+                    </div>
+                </div>
+            </article>
+
+        </section>
+
+        <!-- COHORT LIFECYCLE MATRIX -->
+        <section class="deck-section" style="margin-top: 48px;">
+            <div class="deck-section-bar">
+                <div>
+                    <span class="deck-eyebrow">COHORT LIFECYCLE</span>
+                    <h2 class="deck-section-title">Tenure Risk Degradation</h2>
+                </div>
+                <span class="tenure-badge-down">&darr; Attrition risk drops with relationship longevity</span>
+            </div>
+
+            <div class="deck-card spotlight-card table-glass-card">
+                <table class="clean-deck-table insights-cohort-table">
+                    <thead>
+                        <tr>
+                            <th>TENURE COHORT</th>
+                            <th>BASE POPULATION</th>
+                            <th>OBSERVED CHURN RATE</th>
+                            <th>ATTRITION INTENSITY</th>
+                            <th style="text-align: right;">STRATEGIC PRIORITY</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong class="cohort-name">0–6 Months</strong></td>
+                            <td><span class="cohort-count">1,481 accounts</span></td>
+                            <td><span class="cohort-rate rate-high">52.94%</span></td>
+                            <td>
+                                <div class="cohort-progress-wrap">
+                                    <div class="cohort-progress-fill fill-high" style="width: 52.94%;"></div>
+                                </div>
+                            </td>
+                            <td style="text-align: right;">
+                                <span class="priority-badge badge-critical">Critical (Onboarding Phase)</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td><strong class="cohort-name">7–12 Months</strong></td>
+                            <td><span class="cohort-count">705 accounts</span></td>
+                            <td><span class="cohort-rate rate-mid">35.89%</span></td>
+                            <td>
+                                <div class="cohort-progress-wrap">
+                                    <div class="cohort-progress-fill fill-mid" style="width: 35.89%;"></div>
+                                </div>
+                            </td>
+                            <td style="text-align: right;">
+                                <span class="priority-badge badge-elevated">Medium (Engagement Check)</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td><strong class="cohort-name">13–24 Months</strong></td>
+                            <td><span class="cohort-count">1,024 accounts</span></td>
+                            <td><span class="cohort-rate rate-mid">28.71%</span></td>
+                            <td>
+                                <div class="cohort-progress-wrap">
+                                    <div class="cohort-progress-fill fill-mid" style="width: 28.71%;"></div>
+                                </div>
+                            </td>
+                            <td style="text-align: right;">
+                                <span class="priority-badge badge-elevated">Medium (Engagement Check)</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td><strong class="cohort-name">25+ Months</strong></td>
+                            <td><span class="cohort-count">3,833 accounts</span></td>
+                            <td><span class="cohort-rate rate-low">14.04%</span></td>
+                            <td>
+                                <div class="cohort-progress-wrap">
+                                    <div class="cohort-progress-fill fill-low" style="width: 14.04%;"></div>
+                                </div>
+                            </td>
+                            <td style="text-align: right;">
+                                <span class="priority-badge badge-loyal">Low (Loyalty / Cross-sell)</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div>
+            <strong>ChurnIQ</strong>
+            <span>Customer Retention Intelligence</span>
+        </div>
+        <span>Python · Flask · MySQL</span>
+    </footer>
+
+</div>
+
+<script>
+// SPOTLIGHT CURSOR ENGINE
+document.querySelectorAll(".spotlight-card").forEach(card => {
+    card.addEventListener("mousemove", e => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
+        card.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
+    });
+});
+</script>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

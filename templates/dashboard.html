@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — ChurnIQ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="bento-body">
+
+<div class="app">
+
+    <!-- AURORA AMBIENCE -->
+    <div class="aurora-orb aurora-one"></div>
+    <div class="aurora-orb aurora-two"></div>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="brand">
+                <div class="brand-mark">CI</div>
+                <span>ChurnIQ</span>
+            </a>
+
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/dashboard" class="active">Dashboard</a>
+                <a href="/customers">Customers</a>
+                <a href="/risk">Risk Analysis</a>
+                <a href="/insights">Insights</a>
+            </div>
+
+            <div class="nav-right">
+                <button class="theme-switch-capsule" id="themeToggle" type="button" aria-label="Toggle Theme" title="Toggle theme">
+                    <span class="capsule-icon sun-icon">☀</span>
+                    <span class="capsule-icon moon-icon">☾</span>
+                    <span class="capsule-slider"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CLEAN COHORT DASHBOARD -->
+    <main class="clean-deck">
+
+        <!-- HEADER -->
+        <header class="deck-header">
+            <div>
+                <span class="deck-eyebrow">INTELLIGENCE CONSOLE</span>
+                <h1 class="deck-title">Customer Churn Dashboard</h1>
+                <p class="deck-subtitle">High-level subscriber telemetry and systemic risk distribution.</p>
+            </div>
+            <div class="deck-status-tag">
+                <span class="status-indicator-dot"></span>
+                <span>Live MySQL Pipeline</span>
+            </div>
+        </header>
+
+        <!-- 4 CLEAN KPI CARDS -->
+        <section class="deck-kpis">
+            <div class="deck-card spotlight-card">
+                <span class="card-caption">TOTAL SUBSCRIBERS</span>
+                <div class="card-big-num">{{ "{:,}".format(kpis.total_customers) }}</div>
+                <span class="card-foot-label">Monitored accounts</span>
+            </div>
+
+            <div class="deck-card spotlight-card">
+                <span class="card-caption">CUSTOMERS LOST</span>
+                <div class="card-big-num num-danger">{{ "{:,}".format(kpis.churned_customers) }}</div>
+                <span class="card-foot-label text-danger">Recorded attrition</span>
+            </div>
+
+            <div class="deck-card spotlight-card">
+                <span class="card-caption">CHURN RATE</span>
+                <div class="card-big-num num-accent">{{ kpis.churn_rate }}<small>%</small></div>
+                <span class="card-foot-label">Base attrition ratio</span>
+            </div>
+
+            <div class="deck-card spotlight-card">
+                <span class="card-caption">AVG. MONTHLY BILL</span>
+                <div class="card-big-num">${{ kpis.avg_monthly_charge }}</div>
+                <span class="card-foot-label">Average revenue per user</span>
+            </div>
+        </section>
+
+        <!-- SINGLE HERO FINDING -->
+        <section class="deck-card deck-callout spotlight-card">
+            <div class="callout-left">
+                <span class="callout-tag">KEY FINDING</span>
+                <h2 class="callout-heading">The first 6 months are where churn risk peaks.</h2>
+                <p class="callout-copy">
+                    Subscribers with 0–6 months of tenure account for a <strong>52.94%</strong> attrition rate. Proactive onboarding intervention here yields the highest direct retention return.
+                </p>
+            </div>
+            <div class="callout-right">
+                <span class="callout-stat-num">52.94%</span>
+                <span class="callout-stat-label">0–6 Month Churn</span>
+            </div>
+        </section>
+
+        <!-- AT-RISK WATCHLIST TABLE -->
+        <section class="deck-section">
+            <div class="deck-section-bar">
+                <div>
+                    <span class="deck-eyebrow">EXECUTIVE PRIORITY</span>
+                    <h3 class="deck-section-title">Immediate At-Risk Watchlist</h3>
+                </div>
+            </div>
+
+            <div class="deck-card spotlight-card table-glass-card">
+                <table class="clean-deck-table">
+                    <thead>
+                        <tr>
+                            <th>SUBSCRIBER</th>
+                            <th>TENURE</th>
+                            <th>CONTRACT</th>
+                            <th>MONTHLY RATE</th>
+                            <th>SERVICE</th>
+                            <th style="text-align: right;">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for account in watchlist %}
+                        <tr>
+                            <td class="td-sub-id">{{ account.customer_id }}</td>
+                            <td>{{ account.tenure }} mos</td>
+                            <td><span class="chip-danger">{{ account.contract }}</span></td>
+                            <td class="td-price">${{ "%.2f"|format(account.monthly_charges) }}</td>
+                            <td>{{ account.internet_service }}</td>
+                            <td style="text-align: right;">
+                                <a href="/risk?customer_id={{ account.customer_id }}&gender={{ account.gender }}&senior_citizen={{ account.senior_citizen }}&partner={{ account.partner }}&dependents={{ account.dependents }}&tenure={{ account.tenure }}&contract={{ account.contract }}&monthly_charges={{ account.monthly_charges }}&payment_method={{ account.payment_method }}&internet_service={{ account.internet_service }}&online_security={{ account.online_security }}&tech_support={{ account.tech_support }}&paperless_billing={{ account.paperless_billing }}"
+                                   class="deck-action-btn">
+                                    Assess Risk &rarr;
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 2 CHARTS SIDE-BY-SIDE -->
+        <section class="deck-section">
+            <div class="deck-section-bar">
+                <div>
+                    <span class="deck-eyebrow">CHURN ANALYSIS</span>
+                    <h3 class="deck-section-title">Where is churn concentrated?</h3>
+                </div>
+            </div>
+
+            <div class="deck-charts-grid">
+                <div class="deck-card spotlight-card">
+                    <h4 class="chart-tile-title">Contract Structure</h4>
+                    <p class="chart-tile-sub">Churn rate across subscription agreements.</p>
+                    <div class="clean-chart-frame">
+                        <canvas id="contractChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="deck-card spotlight-card">
+                    <h4 class="chart-tile-title">Payment Behaviour</h4>
+                    <p class="chart-tile-sub">Attrition rate categorized by billing method.</p>
+                    <div class="clean-chart-frame">
+                        <canvas id="paymentChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TENURE LIFECYCLE STRIP -->
+        <section class="deck-card spotlight-card deck-tenure-card">
+            <div class="deck-section-bar" style="margin-bottom: 24px;">
+                <div>
+                    <h4 class="chart-tile-title">Tenure & Retention Timeline</h4>
+                    <p class="chart-tile-sub">Churn risk drops sharply as customer tenure increases.</p>
+                </div>
+                <span class="tenure-badge-down">&darr; Churn with tenure</span>
+            </div>
+
+            <div class="clean-tenure-row">
+                <div class="tenure-step is-critical">
+                    <span class="t-rate">52.94%</span>
+                    <span class="t-label">0–6 mos</span>
+                </div>
+                <div class="tenure-step">
+                    <span class="t-rate">35.89%</span>
+                    <span class="t-label">7–12 mos</span>
+                </div>
+                <div class="tenure-step">
+                    <span class="t-rate">28.71%</span>
+                    <span class="t-label">13–24 mos</span>
+                </div>
+                <div class="tenure-step">
+                    <span class="t-rate">20.39%</span>
+                    <span class="t-label">25–48 mos</span>
+                </div>
+                <div class="tenure-step is-safe">
+                    <span class="t-rate">9.51%</span>
+                    <span class="t-label">49–72 mos</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- INTERNET SERVICE CHART -->
+        <section class="deck-card spotlight-card" style="margin-top: 24px;">
+            <h4 class="chart-tile-title">Internet Service Infrastructure</h4>
+            <p class="chart-tile-sub">Churn rate across connection technology types.</p>
+            <div class="clean-chart-frame wide-chart">
+                <canvas id="internetChart"></canvas>
+            </div>
+        </section>
+
+        <!-- POWER BI ARCHITECTURE DISPLAY -->
+        <section class="deck-card spotlight-card" style="margin-top: 24px; margin-bottom: 80px;">
+            <div class="deck-section-bar" style="margin-bottom: 20px;">
+                <div>
+                    <h4 class="chart-tile-title">Power BI Intelligence Engine</h4>
+                    <p class="chart-tile-sub">Connected via 64-bit MySQL ODBC Driver • Direct DAX Measures</p>
+                </div>
+                <span class="status-pill-blue">Active Engine</span>
+            </div>
+            <div class="clean-bi-image-frame">
+                <img src="{{ url_for('static', filename='img/churn_bi_dashboard.png') }}" 
+                     alt="Customer Churn Intelligence Dashboard" 
+                     loading="lazy">
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div>
+            <strong>ChurnIQ</strong>
+            <span>Customer Retention Intelligence</span>
+        </div>
+        <span>Python · Flask · MySQL</span>
+    </footer>
+
+</div>
+
+<!-- DATA PAYLOADS -->
+<script id="contract-data" type="application/json">{{ contract_data | tojson }}</script>
+<script id="payment-data" type="application/json">{{ payment_data | tojson }}</script>
+<script id="internet-data" type="application/json">{{ internet_data | tojson }}</script>
+
+<script>
+const contractData = JSON.parse(document.getElementById("contract-data").textContent);
+const paymentData = JSON.parse(document.getElementById("payment-data").textContent);
+const internetData = JSON.parse(document.getElementById("internet-data").textContent);
+
+function getChartColors() {
+    const isLight = document.documentElement.getAttribute("data-theme") === "light" ||
+                    document.body.classList.contains("light-mode");
+    return {
+        tickColor: isLight ? "#475569" : "#94a3b8",
+        gridColor: isLight ? "rgba(15, 23, 42, 0.08)" : "rgba(255, 255, 255, 0.05)"
+    };
+}
+
+const colors = getChartColors();
+
+const chartScales = {
+    y: {
+        beginAtZero: true,
+        ticks: {
+            color: colors.tickColor,
+            font: { family: "'Palatino Linotype', Palatino, serif", size: 12 },
+            callback: value => value + "%"
+        },
+        grid: { color: colors.gridColor }
+    },
+    x: {
+        ticks: { 
+            color: colors.tickColor,
+            font: { family: "'Palatino Linotype', Palatino, serif", size: 13 }
+        },
+        grid: { display: false }
+    }
+};
+
+new Chart(document.getElementById("contractChart"), {
+    type: "bar",
+    data: {
+        labels: contractData.map(i => i.contract),
+        datasets: [{
+            data: contractData.map(i => i.churn_rate),
+            borderRadius: 6,
+            backgroundColor: "#38bdf8",
+            hoverBackgroundColor: "#7dd3fc"
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: chartScales
+    }
+});
+
+new Chart(document.getElementById("paymentChart"), {
+    type: "bar",
+    data: {
+        labels: paymentData.map(i => i.payment_method),
+        datasets: [{
+            data: paymentData.map(i => i.churn_rate),
+            borderRadius: 6,
+            backgroundColor: "#fb7185",
+            hoverBackgroundColor: "#fca5a5"
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: chartScales
+    }
+});
+
+new Chart(document.getElementById("internetChart"), {
+    type: "bar",
+    data: {
+        labels: internetData.map(i => i.internet_service),
+        datasets: [{
+            data: internetData.map(i => i.churn_rate),
+            borderRadius: 6,
+            backgroundColor: "#818cf8",
+            hoverBackgroundColor: "#a5b4fc"
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: chartScales
+    }
+});
+
+// CURSOR SPOTLIGHT TRACKER
+document.querySelectorAll(".spotlight-card").forEach(card => {
+    card.addEventListener("mousemove", e => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
+        card.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
+    });
+});
+
+// CHART THEME DYNAMIC SYNC
+function updateChartsTheme(theme) {
+    const isLight = theme === "light";
+    const tickColor = isLight ? "#475569" : "#94a3b8";
+    const gridColor = isLight ? "rgba(15, 23, 42, 0.08)" : "rgba(255, 255, 255, 0.05)";
+
+    [Chart.getChart("contractChart"), Chart.getChart("paymentChart"), Chart.getChart("internetChart")].forEach(chart => {
+        if (chart) {
+            chart.options.scales.y.ticks.color = tickColor;
+            chart.options.scales.y.grid.color = gridColor;
+            chart.options.scales.x.ticks.color = tickColor;
+            chart.update();
+        }
+    });
+}
+
+const toggleBtn = document.getElementById("themeToggle");
+if (toggleBtn) {
+    toggleBtn.addEventListener("click", () => {
+        setTimeout(() => {
+            const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
+            updateChartsTheme(currentTheme);
+        }, 60);
+    });
+}
+</script>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChurnIQ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="brand">
+                <div class="brand-mark">CI</div>
+                <span>ChurnIQ</span>
+            </a>
+
+            <div class="nav-links">
+                <a href="/" class="active">Home</a>
+                <a href="/dashboard">Dashboard</a>
+                <a href="/customers">Customers</a>
+                <a href="/risk">Risk Analysis</a>
+                <a href="/insights">Insights</a>
+            </div>
+
+            <div class="nav-right">
+                <button class="theme-switch-capsule" id="themeToggle" type="button" aria-label="Toggle Theme" title="Toggle theme">
+                    <span class="capsule-icon sun-icon">☀</span>
+                    <span class="capsule-icon moon-icon">☾</span>
+                    <span class="capsule-slider"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <section class="hero">
+        <div class="hero-glow"></div>
+
+        <svg class="churn-graph" viewBox="0 0 1200 500" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+                <filter id="graphGlow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="5" result="blur"></feGaussianBlur>
+                    <feMerge>
+                        <feMergeNode in="blur"></feMergeNode>
+                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                    </feMerge>
+                </filter>
+                <linearGradient id="graphGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#6366f1"/>
+                    <stop offset="50%" stop-color="#a855f7"/>
+                    <stop offset="100%" stop-color="#ec4899"/>
+                </linearGradient>
+            </defs>
+            <path class="graph-line"
+                  d="M0,390 L120,350 L210,365 L330,250 L430,275 L560,125 L680,205 L790,70 L900,145 L1030,55 L1200,15"
+                  fill="none"
+                  stroke="url(#graphGradient)"
+                  stroke-width="2.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  filter="url(#graphGlow)">
+            </path>
+        </svg>
+
+        <div class="hero-content">
+            <div class="eyebrow">CUSTOMER RETENTION INTELLIGENCE</div>
+            <h1 class="hero-title">ChurnIQ</h1>
+            <p class="hero-subtitle">Understand why customers leave. Decide who to retain.</p>
+            <p class="hero-description">
+                A data-driven customer retention platform that transforms churn patterns into actionable business intelligence.
+            </p>
+            <a href="/dashboard" class="hero-button">
+                Explore Dashboard <span>→</span>
+            </a>
+        </div>
+    </section>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

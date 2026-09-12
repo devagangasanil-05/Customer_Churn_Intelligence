@@ -1,0 +1,12 @@
+# Aiven Certificate & Credentials
+ca.pem
+.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment (if any)
+venv/
+.venv/

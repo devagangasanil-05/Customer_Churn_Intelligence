@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Engine — ChurnIQ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="bento-body">
+
+<div class="app">
+
+    <!-- AURORA AMBIENCE -->
+    <div class="aurora-orb aurora-one"></div>
+    <div class="aurora-orb aurora-two"></div>
+
+    <!-- TOP RIBBON -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="brand">
+                <div class="brand-mark">CI</div>
+                <span>ChurnIQ</span>
+            </a>
+
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/dashboard">Dashboard</a>
+                <a href="/customers">Customers</a>
+                <a href="/risk" class="active">Risk Analysis</a>
+                <a href="/insights">Insights</a>
+            </div>
+
+            <div class="nav-right">
+                <button class="theme-switch-capsule" id="themeToggle" type="button" aria-label="Toggle Theme" title="Toggle theme">
+                    <span class="capsule-icon sun-icon">☀</span>
+                    <span class="capsule-icon moon-icon">☾</span>
+                    <span class="capsule-slider"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- RISK ENGINE DECK -->
+    <main class="clean-deck">
+
+        <!-- HEADER -->
+        <header class="deck-header">
+            <div>
+                <span class="deck-eyebrow">PREDICTIVE INFERENCE ENGINE</span>
+                <h1 class="deck-title">Churn Risk Scoring Engine</h1>
+                <p class="deck-subtitle">Simulate subscriber profile variables to predict attrition probability using Scikit-Learn Random Forest.</p>
+            </div>
+            <div class="deck-status-tag">
+                <span class="status-indicator-dot"></span>
+                <span>Random Forest &bull; 77.2% Accuracy</span>
+            </div>
+        </header>
+
+        <!-- DUAL-COLUMN PREDICTION SUITE -->
+        <div class="risk-suite-grid">
+
+            <!-- LEFT: PARAMETER CONFIGURATION CONSOLE -->
+            <section class="deck-card spotlight-card risk-console-panel">
+                <div class="panel-headline">
+                    <div class="panel-title-wrap">
+                        <span class="panel-step-chip">01</span>
+                        <div>
+                            <h3 class="panel-heading">Subscriber Attributes</h3>
+                            <p class="panel-caption">Tune account variables or load from directory</p>
+                        </div>
+                    </div>
+                    {% if request.args.get('customer_id') %}
+                    <span class="loaded-sub-tag">Auditing: {{ request.args.get('customer_id') }}</span>
+                    {% endif %}
+                </div>
+
+                <form method="POST" action="/risk" class="risk-interactive-form">
+                    {% if request.args.get('customer_id') %}
+                    <input type="hidden" name="customer_id" value="{{ request.args.get('customer_id') }}">
+                    {% endif %}
+
+                    <!-- Numeric Row -->
+                    <div class="form-input-split">
+                        <div class="param-field">
+                            <label class="param-label">
+                                <span>TENURE DURATION</span>
+                                <span class="label-hint">Months active</span>
+                            </label>
+                            <div class="input-with-affix">
+                                <input type="number" step="1" min="0" max="72" name="tenure" required
+                                       value="{{ form_data.tenure if form_data else request.args.get('tenure', 12) }}"
+                                       class="param-input">
+                                <span class="input-affix">mos</span>
+                            </div>
+                        </div>
+
+                        <div class="param-field">
+                            <label class="param-label">
+                                <span>MONTHLY CHARGE</span>
+                                <span class="label-hint">Base MRR</span>
+                            </label>
+                            <div class="input-with-affix">
+                                <span class="input-prefix">$</span>
+                                <!-- Replace step="0.05" with step="any" -->
+<input type="number" step="any" min="15" max="150" name="monthly_charges" required
+       value="{{ form_data.monthly_charges if form_data else request.args.get('monthly_charges', 64.76) }}"
+       class="param-input with-prefix">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Core Risk Drivers -->
+                    <div class="form-input-split">
+                        <div class="param-field">
+                            <label class="param-label">CONTRACT TERM</label>
+                            <select name="contract" class="param-select">
+                                {% set selected_c = form_data.contract if form_data else request.args.get('contract', 'Month-to-month') %}
+                                <option value="Month-to-month" {% if selected_c == 'Month-to-month' %}selected{% endif %}>Month-to-month (High Risk)</option>
+                                <option value="One year" {% if selected_c == 'One year' %}selected{% endif %}>One year (Committed)</option>
+                                <option value="Two year" {% if selected_c == 'Two year' %}selected{% endif %}>Two year (Secured)</option>
+                            </select>
+                        </div>
+
+                        <div class="param-field">
+                            <label class="param-label">PAYMENT CHANNEL</label>
+                            <select name="payment_method" class="param-select">
+                                {% set selected_p = form_data.payment_method if form_data else request.args.get('payment_method', 'Electronic check') %}
+                                <option value="Electronic check" {% if selected_p == 'Electronic check' %}selected{% endif %}>Electronic check</option>
+                                <option value="Mailed check" {% if selected_p == 'Mailed check' %}selected{% endif %}>Mailed check</option>
+                                <option value="Bank transfer (automatic)" {% if selected_p == 'Bank transfer (automatic)' %}selected{% endif %}>Bank transfer (automatic)</option>
+                                <option value="Credit card (automatic)" {% if selected_p == 'Credit card (automatic)' %}selected{% endif %}>Credit card (automatic)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Tech Stack -->
+                    <div class="form-input-split">
+                        <div class="param-field">
+                            <label class="param-label">NETWORK CONNECTION</label>
+                            <select name="internet_service" class="param-select">
+                                {% set selected_i = form_data.internet_service if form_data else request.args.get('internet_service', 'Fiber optic') %}
+                                <option value="Fiber optic" {% if selected_i == 'Fiber optic' %}selected{% endif %}>Fiber optic</option>
+                                <option value="DSL" {% if selected_i == 'DSL' %}selected{% endif %}>DSL</option>
+                                <option value="No" {% if selected_i == 'No' %}selected{% endif %}>None (Cellular only)</option>
+                            </select>
+                        </div>
+
+                        <div class="param-field">
+                            <label class="param-label">SENIOR CITIZEN</label>
+                            <select name="senior_citizen" class="param-select">
+                                {% set selected_s = form_data.senior_citizen if form_data else request.args.get('senior_citizen', '0') %}
+                                <option value="0" {% if selected_s|string == '0' %}selected{% endif %}>No</option>
+                                <option value="1" {% if selected_s|string == '1' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Security & Tech Support Addons -->
+                    <div class="form-input-split">
+                        <div class="param-field">
+                            <label class="param-label">CYBERSECURITY BUNDLE</label>
+                            <select name="online_security" class="param-select">
+                                {% set selected_os = form_data.online_security if form_data else request.args.get('online_security', 'No') %}
+                                <option value="No" {% if selected_os == 'No' %}selected{% endif %}>No (Vulnerable)</option>
+                                <option value="Yes" {% if selected_os == 'Yes' %}selected{% endif %}>Yes (Protected)</option>
+                                <option value="No internet service" {% if selected_os == 'No internet service' %}selected{% endif %}>No internet</option>
+                            </select>
+                        </div>
+
+                        <div class="param-field">
+                            <label class="param-label">TECH SUPPORT SLA</label>
+                            <select name="tech_support" class="param-select">
+                                {% set selected_ts = form_data.tech_support if form_data else request.args.get('tech_support', 'No') %}
+                                <option value="No" {% if selected_ts == 'No' %}selected{% endif %}>No Dedicated SLA</option>
+                                <option value="Yes" {% if selected_ts == 'Yes' %}selected{% endif %}>Yes (Dedicated)</option>
+                                <option value="No internet service" {% if selected_ts == 'No internet service' %}selected{% endif %}>No internet</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Demographics -->
+                    <div class="form-input-split">
+                        <div class="param-field">
+                            <label class="param-label">PARTNER CO-HABITANT</label>
+                            <select name="partner" class="param-select">
+                                {% set selected_pr = form_data.partner if form_data else request.args.get('partner', 'No') %}
+                                <option value="No" {% if selected_pr == 'No' %}selected{% endif %}>No</option>
+                                <option value="Yes" {% if selected_pr == 'Yes' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+
+                        <div class="param-field">
+                            <label class="param-label">DEPENDENTS</label>
+                            <select name="dependents" class="param-select">
+                                {% set selected_dp = form_data.dependents if form_data else request.args.get('dependents', 'No') %}
+                                <option value="No" {% if selected_dp == 'No' %}selected{% endif %}>No</option>
+                                <option value="Yes" {% if selected_dp == 'Yes' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="engine-run-btn">
+                        <span>Execute ML Inference</span>
+                        <span class="btn-arrow">&rarr;</span>
+                    </button>
+                </form>
+            </section>
+
+            <!-- RIGHT: INFERENCE OUTPUT OR LIVE RADAR SIMULATOR -->
+            <section class="deck-card spotlight-card risk-display-panel">
+
+                {% if result %}
+                <!-- PREDICTION ACTIVE RESULT -->
+                <div class="inference-result-view">
+                    <div class="result-top-bar">
+                        <span class="result-kicker">MODEL EVALUATION COMPLETE</span>
+                        {% if result.risk_level == 'High Risk' %}
+                        <span class="risk-pill-danger">CRITICAL ATTRITION RISK</span>
+                        {% elif result.risk_level == 'Medium Risk' %}
+                        <span class="risk-pill-warning">ELEVATED ATTENTION REQUIRED</span>
+                        {% else %}
+                        <span class="risk-pill-safe">ACCOUNT STABLE</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Circular Tactical Gauge -->
+                    <div class="tactical-gauge-wrapper">
+                        <div class="tactical-gauge-ring {% if result.risk_level == 'High Risk' %}gauge-danger{% elif result.risk_level == 'Medium Risk' %}gauge-warning{% else %}gauge-safe{% endif %}">
+                            <span class="gauge-percentage">{{ result.probability }}%</span>
+                            <span class="gauge-label">CHURN PROBABILITY</span>
+                        </div>
+                    </div>
+
+                    <div class="result-details-grid">
+                        <div class="detail-cell">
+                            <span class="detail-label">PREDICTED VERDICT</span>
+                            <span class="detail-val {% if result.risk_level == 'High Risk' %}val-danger{% elif result.risk_level == 'Medium Risk' %}val-warning{% else %}val-safe{% endif %}">
+                                {{ result.prediction }}
+                            </span>
+                        </div>
+                        <div class="detail-cell">
+                            <span class="detail-label">CLASSIFICATION TIER</span>
+                            <span class="detail-val">{{ result.risk_level }}</span>
+                        </div>
+                    </div>
+
+                    <div class="intervention-playbook-box">
+                        <div class="playbook-head">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            </svg>
+                            <span>RECOMMENDED INTERVENTION PLAYBOOK</span>
+                        </div>
+                        <p class="playbook-body">{{ result.recommendation }}</p>
+                    </div>
+
+                    <div class="driver-factors-box">
+                        <span class="drivers-title">IDENTIFIED FRICTION DRIVERS</span>
+                        <div class="driver-tags-row">
+                            {% if form_data.contract == 'Month-to-month' %}
+                            <span class="driver-tag alert">Month-to-month friction</span>
+                            {% endif %}
+                            {% if form_data.tenure|int <= 6 %}
+                            <span class="driver-tag alert">0–6 Month Danger Zone</span>
+                            {% endif %}
+                            {% if form_data.payment_method == 'Electronic check' %}
+                            <span class="driver-tag warning">Manual Electronic Check</span>
+                            {% endif %}
+                            {% if form_data.online_security == 'No' %}
+                            <span class="driver-tag warning">Unbundled Security</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% else %}
+                <!-- AWAITING INFERENCE: HUMAN-DESIGNED ACTIVE SIMULATION RADAR -->
+                <div class="simulation-standby-view">
+                    <div class="standby-scanner">
+                        <div class="scanner-ping-ring"></div>
+                        <div class="scanner-core-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="standby-messaging">
+                        <h3 class="standby-heading">Awaiting Parameter Execution</h3>
+                        <p class="standby-desc">
+                            Select subscriber traits on the left or load an active profile from the Customer Explorer to compute real-time attrition probabilities.
+                        </p>
+                    </div>
+
+                    <!-- Visual Telemetry Blueprint to eliminate empty void -->
+                    <div class="readiness-matrix">
+                        <span class="matrix-title">MODEL FEATURE SENSITIVITY PROFILE</span>
+                        
+                        <div class="sensitivity-row">
+                            <div class="sens-info">
+                                <span class="sens-name">Contract Horizon (M2M vs Annual)</span>
+                                <span class="sens-weight">High Impact (38%)</span>
+                            </div>
+                            <div class="sens-bar-track">
+                                <div class="sens-bar-fill" style="width: 78%; background: #fb7185;"></div>
+                            </div>
+                        </div>
+
+                        <div class="sensitivity-row">
+                            <div class="sens-info">
+                                <span class="sens-name">Tenure Duration Lifecycle</span>
+                                <span class="sens-weight">High Impact (27%)</span>
+                            </div>
+                            <div class="sens-bar-track">
+                                <div class="sens-bar-fill" style="width: 62%; background: #a855f7;"></div>
+                            </div>
+                        </div>
+
+                        <div class="sensitivity-row">
+                            <div class="sens-info">
+                                <span class="sens-name">Billing Channel Friction</span>
+                                <span class="sens-weight">Moderate (19%)</span>
+                            </div>
+                            <div class="sens-bar-track">
+                                <div class="sens-bar-fill" style="width: 44%; background: #38bdf8;"></div>
+                            </div>
+                        </div>
+
+                        <div class="sensitivity-row">
+                            <div class="sens-info">
+                                <span class="sens-name">Security & Tech Support SLA</span>
+                                <span class="sens-weight">Moderate (16%)</span>
+                            </div>
+                            <div class="sens-bar-track">
+                                <div class="sens-bar-fill" style="width: 36%; background: #818cf8;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="standby-footer-tip">
+                        <span>Pro Tip: Accounts in their first 6 months on month-to-month contracts trigger immediate Tier-1 intervention alerts.</span>
+                    </div>
+                </div>
+                {% endif %}
+
+            </section>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div>
+            <strong>ChurnIQ</strong>
+            <span>Customer Retention Intelligence Engine</span>
+        </div>
+        <span>Python · Flask · MySQL · Scikit-Learn</span>
+    </footer>
+
+</div>
+
+<script>
+// SPOTLIGHT MOUSE ENGINE
+document.querySelectorAll(".spotlight-card").forEach(card => {
+    card.addEventListener("mousemove", e => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
+        card.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
+    });
+});
+</script>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
