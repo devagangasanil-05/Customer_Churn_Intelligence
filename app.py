@@ -6,8 +6,21 @@ import os
 from pathlib import Path
 
 import joblib
-import pandas as pd
-from flask import Flask, Response, render_template, request
+import importlib
+
+pd = importlib.import_module("pandas") if importlib.util.find_spec("pandas") else None
+
+try:
+    psycopg2_extras = importlib.import_module("psycopg2.extras")
+    RealDictCursor = psycopg2_extras.RealDictCursor
+except ImportError:
+    RealDictCursor = None
+
+flask = importlib.import_module("flask")
+Flask = flask.Flask
+Response = flask.Response
+render_template = flask.render_template
+request = flask.request
 from src.database import get_connection
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -48,7 +61,7 @@ def landing():
 @app.route("/dashboard")
 def dashboard():
     conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
 
     total_customers = 0
     churned_customers = 0
@@ -87,7 +100,7 @@ def dashboard():
         cursor.execute("""
             SELECT
                 b.contract AS contract,
-                ROUND(SUM(CASE WHEN ch.churn = 'Yes' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS churn_rate
+                ROUND((SUM(CASE WHEN ch.churn = 'Yes' THEN 1 ELSE 0 END) * 100.0 / COUNT(*))::numeric, 2) AS churn_rate
             FROM billing b
             JOIN churn ch ON b.customer_id = ch.customer_id
             GROUP BY b.contract
@@ -97,7 +110,7 @@ def dashboard():
         cursor.execute("""
             SELECT
                 b.payment_method AS payment_method,
-                ROUND(SUM(CASE WHEN ch.churn = 'Yes' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS churn_rate
+                ROUND((SUM(CASE WHEN ch.churn = 'Yes' THEN 1 ELSE 0 END) * 100.0 / COUNT(*))::numeric, 2) AS churn_rate
             FROM billing b
             JOIN churn ch ON b.customer_id = ch.customer_id
             GROUP BY b.payment_method
@@ -108,7 +121,7 @@ def dashboard():
         cursor.execute("""
             SELECT
                 s.internet_service AS internet_service,
-                ROUND(SUM(CASE WHEN ch.churn = 'Yes' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS churn_rate
+                ROUND((SUM(CASE WHEN ch.churn = 'Yes' THEN 1 ELSE 0 END) * 100.0 / COUNT(*))::numeric, 2) AS churn_rate
             FROM services s
             JOIN churn ch ON s.customer_id = ch.customer_id
             GROUP BY s.internet_service
@@ -170,7 +183,7 @@ def customers():
     churn_filter = request.args.get("churn", "").strip()
 
     conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
     customer_records = []
 
     try:
@@ -239,7 +252,7 @@ def export_customers():
     churn_filter = request.args.get("churn", "").strip()
 
     conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
 
     try:
         base_query = """
@@ -436,7 +449,7 @@ def risk():
 @app.route("/insights")
 def insights():
     conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
 
     fiber_risk = {"churn_rate": 0.0, "monthly_revenue_risk": 0.0}
     financial_impact = {"high_value_churned": 0, "lost_mrr": 0.0}
@@ -445,8 +458,8 @@ def insights():
     try:
         cursor.execute("""
             SELECT 
-                ROUND(SUM(CASE WHEN ch.churn = 'Yes' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS churn_rate,
-                ROUND(SUM(b.monthly_charges), 2) AS monthly_revenue_risk
+                ROUND((SUM(CASE WHEN ch.churn = 'Yes' THEN 1 ELSE 0 END) * 100.0 / COUNT(*))::numeric, 2) AS churn_rate,
+                ROUND(SUM(b.monthly_charges)::numeric, 2) AS monthly_revenue_risk
             FROM billing b
             JOIN services s ON b.customer_id = s.customer_id
             JOIN churn ch ON b.customer_id = ch.customer_id
@@ -464,7 +477,7 @@ def insights():
         cursor.execute("""
             SELECT 
                 COUNT(*) AS high_value_churned,
-                ROUND(SUM(b.monthly_charges), 2) AS lost_mrr
+                ROUND(SUM(b.monthly_charges)::numeric, 2) AS lost_mrr
             FROM billing b
             JOIN churn ch ON b.customer_id = ch.customer_id
             WHERE ch.churn = 'Yes' AND b.monthly_charges >= 80.0
@@ -485,7 +498,7 @@ def insights():
                     ELSE '25+ Months'
                 END AS tenure_bracket,
                 COUNT(*) AS total_count,
-                ROUND(SUM(CASE WHEN ch.churn = 'Yes' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS churn_rate
+                ROUND((SUM(CASE WHEN ch.churn = 'Yes' THEN 1 ELSE 0 END) * 100.0 / COUNT(*))::numeric, 2) AS churn_rate
             FROM customers c
             JOIN churn ch ON c.customer_id = ch.customer_id
             GROUP BY tenure_bracket

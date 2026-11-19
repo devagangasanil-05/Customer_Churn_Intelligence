@@ -3,4 +3,5 @@ mysql-connector-python
 pandas
 joblib
 scikit-learn
+python-dotenv
 gunicorn

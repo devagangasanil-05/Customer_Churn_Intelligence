@@ -76,7 +76,7 @@ a {
    TOP RIBBON & CAPSULE SWITCHER
    ========================================================================== */
 .navbar {
-    height: 80px;
+    height: 90px;
     width: 100%;
     border-bottom: 1px solid var(--border);
     background: rgba(7, 8, 13, 0.88);
@@ -106,7 +106,7 @@ body.light-mode .navbar {
     display: flex;
     align-items: center;
     gap: 14px;
-    font-size: 24px;
+    font-size: 21px;
     font-weight: 700;
     letter-spacing: -0.5px;
 }
@@ -139,12 +139,12 @@ body.light-mode .navbar {
 
 .nav-links a {
     color: var(--muted);
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 600;
     transition: color 0.2s ease;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
 .nav-links a:hover,
@@ -161,8 +161,8 @@ body.light-mode .navbar {
 /* Interactive Capsule Toggle */
 .theme-switch-capsule {
     position: relative;
-    width: 66px;
-    height: 32px;
+    width: 72px;
+    height: 36px;
     border-radius: 9999px;
     background: #121520;
     border: 1px solid rgba(255, 255, 255, 0.12);
@@ -181,7 +181,7 @@ body.light-mode .navbar {
 }
 
 .capsule-icon {
-    font-size: 13px;
+    font-size: 21px;
     line-height: 1;
     z-index: 2;
     transition: color 0.3s ease, opacity 0.3s ease;
@@ -201,9 +201,9 @@ body.light-mode .navbar {
 .capsule-slider {
     position: absolute;
     top: 3px;
-    right: 4px;
-    width: 24px;
-    height: 24px;
+    right: 3px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     background: linear-gradient(135deg, #a855f7, #6366f1);
     box-shadow: 0 2px 8px rgba(168, 85, 247, 0.45);
@@ -220,7 +220,7 @@ body.light-mode .theme-switch-capsule {
 
 [data-theme="light"] .capsule-slider,
 body.light-mode .capsule-slider {
-    transform: translateX(-34px);
+    transform: translateX(-36px);
     background: linear-gradient(135deg, #fbbf24, #f59e0b);
     box-shadow: 0 2px 8px rgba(245, 158, 11, 0.45);
 }

@@ -1,38 +1,33 @@
-import pandas as pd
-import mysql.connector
+import pandas as pd  # type: ignore[import-not-found]
+from psycopg2.extras import execute_values  # type: ignore[import-not-found]
+from src.database import get_connection
 
 # Load cleaned dataset
 df = pd.read_csv("data/telco_customer_churn_cleaned.csv")
 
-# Connect to MySQL
-connection = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="Devaganga_05",
-    database="customer_churn"
-)
-
+# Connect to PostgreSQL
+connection = get_connection()
 cursor = connection.cursor()
 
 # Insert customers
 customer_query = """
-INSERT IGNORE INTO customers
+INSERT INTO customers
 (customer_id, gender, senior_citizen, partner, dependents, tenure)
-VALUES (%s, %s, %s, %s, %s, %s)
+VALUES %s
+ON CONFLICT (customer_id) DO NOTHING
 """
 
 customer_data = df[
     ['customerID', 'gender', 'SeniorCitizen', 'Partner', 'Dependents', 'tenure']
 ].values.tolist()
 
-cursor.executemany(customer_query, customer_data)
-
+execute_values(cursor, customer_query, customer_data, page_size=500)
 print("Customers inserted:", cursor.rowcount)
 connection.commit()
 
 # Insert services
 services_query = """
-INSERT IGNORE INTO services
+INSERT INTO services
 (
     customer_id,
     phone_service,
@@ -45,7 +40,8 @@ INSERT IGNORE INTO services
     streaming_tv,
     streaming_movies
 )
-VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+VALUES %s
+ON CONFLICT (customer_id) DO NOTHING
 """
 
 services_data = df[
@@ -63,10 +59,8 @@ services_data = df[
     ]
 ].values.tolist()
 
-cursor.executemany(services_query, services_data)
-
+execute_values(cursor, services_query, services_data, page_size=500)
 print("Services inserted:", cursor.rowcount)
-
 connection.commit()
 
 print("CSV loaded:", df.shape)
@@ -77,7 +71,7 @@ print("Database connected successfully!")
 # -------------------------
 
 billing_query = """
-INSERT IGNORE INTO billing
+INSERT INTO billing
 (
     customer_id,
     contract,
@@ -86,7 +80,8 @@ INSERT IGNORE INTO billing
     monthly_charges,
     total_charges
 )
-VALUES (%s, %s, %s, %s, %s, %s)
+VALUES %s
+ON CONFLICT (customer_id) DO NOTHING
 """
 
 billing_data = df[
@@ -100,10 +95,8 @@ billing_data = df[
     ]
 ].values.tolist()
 
-cursor.executemany(billing_query, billing_data)
-
+execute_values(cursor, billing_query, billing_data, page_size=500)
 print("Billing inserted:", cursor.rowcount)
-
 connection.commit()
 
 # -------------------------
@@ -111,12 +104,13 @@ connection.commit()
 # -------------------------
 
 churn_query = """
-INSERT IGNORE INTO churn
+INSERT INTO churn
 (
     customer_id,
     churn
 )
-VALUES (%s, %s)
+VALUES %s
+ON CONFLICT (customer_id) DO NOTHING
 """
 
 churn_data = df[
@@ -126,8 +120,9 @@ churn_data = df[
     ]
 ].values.tolist()
 
-cursor.executemany(churn_query, churn_data)
-
+execute_values(cursor, churn_query, churn_data, page_size=500)
 print("Churn inserted:", cursor.rowcount)
-
 connection.commit()
+
+cursor.close()
+connection.close()
